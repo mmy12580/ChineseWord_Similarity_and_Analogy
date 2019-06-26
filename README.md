@@ -10,6 +10,7 @@ python3.6.5
 ````
 gensim==3.7.3
 numpy==1.16.4
+scipy==1.3.0
 ````
 
 ## Quick Usage:
