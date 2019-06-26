@@ -1,4 +1,5 @@
 import argparse
+import numpy as np 
 import multiprocessing as mp
 
 from utils import cosine
@@ -13,14 +14,28 @@ class TestAnalogy(object):
 
 
     def findIdx4word(self, word, sim_res):
-        for i, item in enumerate(sim_res):
+        """Finding
+        
+        Arguments:
+            word {str} -- A true word in analogy test file
+            sim_res {list} -- A list of similar results
+        
+        Returns:
+            int -- Index of ranking results 
+            int -- Indicator if the true word in the list
+        """
+        for idx, item in enumerate(sim_res):
             if word == item:
-                return i, 1
+                return idx, 1
         return None, 0
 
-
     def calcAnalogy(self, test_file, embd_vec):
+        """A function caculate word analogy 
         
+        Arguments:
+            test_file {str} -- A local path for embedding
+            embd_vec {str} -- Human designed analogy file
+        """
         res_dict = {}
         ranks = []
         num = 0
@@ -42,12 +57,15 @@ class TestAnalogy(object):
                     prev_topic = topic
                 else:
                     words = line.strip('\n').split()
+                    if len(words) != 4:
+                        continue 
+
                     if any([w not in embd_vec for w in words]):
                         print(f'Line {i} have word(s) not in given embedding')
                         continue
-                    
-                    result = embd_vec.most_similar(positive=words[1::-1], negative=words[-1]) 
-                    rank, pred = self.findIdx4word(words[2], result)
+
+                    result = embd_vec.most_similar(positive=words[1::-1], negative=[words[-1]])
+                    rank, pred = self.findIdx4word(words[-2], result)
                     ranks.append(rank)
                     right_pred += pred
                     num += 1
